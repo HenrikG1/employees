@@ -21,9 +21,23 @@ export default class Root extends React.Component<any, ComponentState> {
   }
 
   componentDidMount() {
-    fetch("https://reqres.in/api/users").then((response) => {
-      response.json().then((data) => this.setState({ employees: data.data }));
-    });
+    // Using JSONPlaceholder API which is free and doesn't require API key
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then((response) => response.json())
+      .then((users) => {
+        // Transform the data to match our Employee interface
+        const employees = users.map((user: any) => ({
+          id: user.id,
+          first_name: user.name.split(' ')[0],
+          last_name: user.name.split(' ')[1] || '',
+          email: user.email,
+          avatar: `https://i.pravatar.cc/150?img=${user.id}` // Random avatar service
+        }));
+        this.setState({ employees });
+      })
+      .catch((error) => {
+        console.error('Error fetching employees:', error);
+      });
   }
 
   componentDidCatch(error, errorInfo) {
